@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"log/slog"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -11,10 +12,32 @@ import (
 type LocationList []int
 
 type LocationParser struct {
+	left  LocationList
+	right LocationList
+}
+
+func (lb *LocationParser) AddLine(l, r int) {
+	lb.left = append(lb.left, l)
+	lb.right = append(lb.right, r)
 }
 
 func (lb *LocationParser) Result() int {
-	return 0
+	slices.Sort(lb.left)
+	slices.Sort(lb.right)
+
+	res := 0
+
+	for i := 0; i != len(lb.left); i += 1 {
+		tmp := lb.left[i] - lb.right[i]
+
+		if tmp < 0 {
+			tmp = -tmp
+		}
+
+		res += tmp
+	}
+
+	return res
 }
 
 func main() {
@@ -39,8 +62,7 @@ func main() {
 
 	r := bufio.NewReader(f)
 
-	var listA LocationList
-	var listB LocationList
+	lp := LocationParser{}
 
 	for {
 		line, _, err := r.ReadLine()
@@ -58,16 +80,15 @@ func main() {
 			slog.Error("malformed file: could not convert to int")
 			os.Exit(1)
 		}
-		listA = append(listA, a)
 
 		b, err := strconv.Atoi(result[1])
 		if err != nil {
 			slog.Error("malformed file: could not convert to int")
 			os.Exit(1)
 		}
-		listB = append(listB, b)
 
-		slog.Info("a" + result[0])
-		slog.Info("b" + result[1])
+		lp.AddLine(a, b)
 	}
+
+	slog.With("result", lp.Result()).Info("finished")
 }

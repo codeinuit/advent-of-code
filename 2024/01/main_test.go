@@ -7,9 +7,14 @@ import (
 )
 
 func TestLocationParser(t *testing.T) {
-	//subject := "3   4\n4   3\n2   5\n1   3\n3   9\n3   3"
-
 	lp := LocationParser{}
+
+	lp.AddLine(3, 4)
+	lp.AddLine(4, 3)
+	lp.AddLine(2, 5)
+	lp.AddLine(1, 3)
+	lp.AddLine(3, 9)
+	lp.AddLine(3, 3)
 
 	assert.Equal(t, 11, lp.Result())
 }
